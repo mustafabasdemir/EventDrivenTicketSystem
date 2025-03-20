@@ -1,12 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using TicketSaleAPI.Data;
 using TicketSaleAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Veritabaný baðlantisi
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    b=> b.MigrationsAssembly("TicketSaleAPI.Data")));
+
+
+
 // RabbitMqService
 builder.Services.AddSingleton<RabbitMqService>();
 
-// Serilog'u yapýlandýr
+// Serilog
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()      // Konsol log yaz
     .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)  // Dosyaya log yaz
